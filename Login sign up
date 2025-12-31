@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Register | Premium</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- ✅ Firebase Scripts (FULL) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<style>
+body{
+
+  background:url('https://images.unsplash.com/photo-1501785888041-af3ef285b470') center/cover no-repeat;
+}
+.glass{
+  backdrop-filter: blur(15px);
+  background: rgba(255,255,255,0.15);
+}
+</style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center">
+
+<div class="glass w-[90%] max-w-md rounded-2xl p-6 shadow-2xl text-white">
+  <h2 class="text-2xl font-bold text-center mb-6">🔥 Premium Login</h2>
+
+  <input id="username" type="text" placeholder="Username"
+    class="w-full bg-transparent border-b mb-4 outline-none p-2">
+
+  <input id="email" type="email" placeholder="Email"
+    class="w-full bg-transparent border-b mb-4 outline-none p-2">
+
+  <input id="password" type="password" placeholder="Password"
+    class="w-full bg-transparent border-b mb-4 outline-none p-2">
+
+
+
+  <button onclick="registerUser()"
+    class="w-full bg-green-900 hover:bg-green-800 py-2 rounded-xl mt-4">
+    sign up
+  </button>
+
+  <p class="text-center mt-4 text-sm">
+    Already have an account?
+    <a href="login.html" class="underline">sign up</a>
+  </p>
+</div>
+
+<script>
+// 🔥 REAL Firebase Config yahan paste karo
+const firebaseConfig = {
+  apiKey: "AIzaSyCtdfB7eOwCV3Or39hbRkIiUQFmV3oXOSk",
+  authDomain: "free-d0cd4.firebaseapp.com",
+  databaseURL: "http://free-d0cd4.firebasestorage.com",
+  projectId: "free-d0cd4"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.database();
+
+// 🤖 Telegram
+const BOT_TOKEN = "@aloneboy_bot";
+const CHAT_ID = "-@ALONE_BOU";
+
+function registerUser(){
+  const username = document.getElementById("username").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  if(!username || !email || !password){
+    alert("All fields required");
+    return;
+  }
+
+  auth.createUserWithEmailAndPassword(email, password)
+  .then((userCred) => {
+
+    const uid = userCred.user.uid;
+
+    // ✅ Save in Firebase Database
+    db.ref("users/" + uid).set({
+      username: username,
+      email: email,
+      role: "premium",
+      createdAt: Date.now()
+    });
+
+    sendTelegram(username, email);
+
+    alert("Register Successful");
+    window.location.href = "login.html";
+  })
+  .catch(error => alert(error.message));
+}
+
+function sendTelegram(username, email){
+  const text =
+`🔥 New Premium Register
+👤 Username: ${username}
+📧 Email: ${email}`;
+
+  fetch("https://api.telegram.org/bot" + BOT_TOKEN + "/sendMessage", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      chat_id: CHAT_ID,
+      text: text
+    })
+  });
+}
+</script>
+
+</body>
+</html>
