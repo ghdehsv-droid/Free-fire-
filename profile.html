@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALONE BOY | Premium</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    boxShadow: {
+                        neon: "0 0 20px rgba(168,85,247,0.6)",
+                        glass: "0 8px 32px rgba(0,0,0,0.4)"
+                    },
+                    animation: {
+                        float: "float 6s ease-in-out infinite",
+                        glow: "pulse 2s infinite"
+                    },
+                    keyframes: {
+                        float: {
+                            "0%,100%": { transform: "translateY(0)" },
+                            "50%": { transform: "translateY(-10px)" }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background: radial-gradient(circle at top, #1f2937, #020617); overflow-x: hidden; }
+        .glass { backdrop-filter: blur(14px); background: rgba(255,255,255,0.05); }
+        .modal-scroll::-webkit-scrollbar { width: 5px; }
+        .modal-scroll::-webkit-scrollbar-thumb { background: #a855f7; border-radius: 10px; }
+        
+        @keyframes rgbMove {
+            0% { background-position: 0% 60%; }
+            50% { background-position: 100% 60%; }
+            100% { background-position: 0% 60%; }
+        }
+        .banner-rgb { position: relative; overflow: hidden; }
+        .rgb-light {
+            position: absolute; inset: 0;
+            background: linear-gradient(120deg, #ff00ff, #8b5cf6, #00ffff, #22c55e, #f59e0b, #ff00ff);
+            background-size: 300% 300%;
+            animation: rgbMove 6s linear infinite;
+            opacity: 0.6; filter: blur(18px); pointer-events: none;
+        }
+
+        .btn-in-use { background-color: #4b5563 !important; cursor: default; opacity: 0.7; }
+        #sidebar { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 250; }
+        .sidebar-overlay { background: rgba(0, 0, 0, 0.8); display: none; position: fixed; inset: 0; z-index: 240; backdrop-filter: blur(4px); }
+        
+        .input-box { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); width: 100%; padding: 12px; border-radius: 8px; outline: none; font-size: 14px; color: white; }
+        .input-box:focus { border-color: #8b5cf6; }
+        .label-text { font-size: 10px; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px; display: block; margin-left: 4px; }
+        .btn-purple { background: #7c3aed; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 14px; transition: 0.3s; }
+
+        /* Dashboard Specific Styles */
+        .dash-card { background: #1e2533; border-radius: 12px; padding: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
+        .status-row { background: #1e2533; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .dash-nav-item { background: #1e2533; padding: 12px 16px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
+    </style>
+</head>
+<body class="dark text-white min-h-screen">
+
+    <div id="sidebarOverlay" onclick="toggleSidebar(false)" class="sidebar-overlay"></div>
+    
+    <div id="sidebar" class="fixed top-0 left-0 h-full w-72 bg-[#111319] border-r border-white/5 -translate-x-full shadow-2xl">
+        <div class="p-5 flex justify-between items-center border-b border-white/5">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center shadow-lg">
+                    <i class="fa-solid fa-ghost text-white text-lg"></i>
+                </div>
+                <span class="font-bold text-xl tracking-tight text-white uppercase">Alone<span class="text-green-500"> Boy</span></span>
+            </div>
+            <button onclick="toggleSidebar(false)" class="text-gray-500 hover:text-white transition">
+                <i class="fa-solid fa-xmark text-2xl"></i>
+            </button>
+        </div>
+        <nav class="p-4 mt-4 space-y-2">
+            <button onclick="openDashboard(); toggleSidebar(false);" class="w-full flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/10 text-gray-200 hover:bg-purple-600/20 hover:border-purple-500/50 transition-all group">
+                <i class="fa-solid fa-house text-gray-400 group-hover:text-purple-400"></i>
+                <span class="font-bold text-sm tracking-widest">DASHBOARD</span> </button>
+        </nav>
+    </div>
+
+    <header class="glass shadow-glass p-4 flex justify-between items-center sticky top-0 z-50">
+        <div class="flex gap-4 text-xl items-center">
+            <i class="fa-solid fa-bars cursor-pointer hover:text-purple-400 transition" onclick="toggleSidebar(true)"></i>
+            <span class="font-bold tracking-widest text-purple-400">ALONE BOY</span>
+        </div>
+        <div class="flex gap-4 text-lg items-center">
+            <i class="fa-solid fa-moon cursor-pointer"></i>
+            <i class="fa-solid fa-bell cursor-pointer"></i>
+            <i class="fa-solid fa-gem text-purple-400 cursor-pointer"></i>
+        </div>
+    </header>
+
+    <main class="max-w-lg mx-auto p-4 space-y-6">
+        <div class="glass rounded-2xl shadow-neon overflow-hidden animate-float">
+            <div class="h-28 bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 banner-rgb">
+                <div class="rgb-light"></div>
+            </div>
+            <div class="p-6 relative">
+                <div class="absolute -top-14 left-6">
+                    <div class="w-24 h-24 rounded-full bg-black flex items-center justify-center text-4xl border-4 border-purple-500 shadow-neon relative">
+                        ?
+                        <span class="absolute bottom-1 right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-black"></span>
+                    </div>
+                </div>
+                <div class="mt-12 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-2xl font-extrabold tracking-wide">ALONE_BOU</h2>
+                        <p class="text-sm text-purple-400">ALONE BOY_BOT</p>
+                    </div>
+                    <span class="px-3 py-1 text-xs font-bold rounded-full bg-green-500/20 text-green-400 border border-green-500">
+                        ✔ VERIFIED
+                    </span>
+                </div>
+                <div class="mt-4 glass p-3 rounded-lg text-sm truncate border border-white/10 font-mono">
+                    https://l.indian-plays.site/070ea113a2
+                </div>
+                <div class="grid grid-cols-3 gap-3 mt-5 text-center">
+                    <div class="glass rounded-xl p-3 border border-white/10"><p class="text-xs text-gray-300">RANK</p><p class="text-xl font-bold">#786</p></div>
+                    <div class="glass rounded-xl p-3 border border-white/10"><p class="text-xs text-gray-300">RESULT</p><p class="text-xl font-bold">0</p></div>
+                    <div class="glass rounded-xl p-3 border border-purple-500 shadow-neon"><p class="text-xs text-purple-400">POWER</p><p class="text-xl font-bold text-purple-400 animate-glow">🔥 99</p></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            <button onclick="toggleAccountModal(true)" class="glass w-full p-4 rounded-xl flex justify-between items-center hover:shadow-neon transition group">
+                <span class="flex items-center gap-3"><i class="fa-solid fa-gear text-purple-400 group-hover:rotate-90 transition-transform"></i> ACCOUNT SETTINGS</span>
+                <i class="fa-solid fa-chevron-right text-purple-400"></i>
+            </button>
+            <button onclick="toggleModal(true)" class="glass w-full p-4 rounded-xl flex justify-between items-center hover:shadow-neon transition group">
+                <span class="flex items-center gap-3"><i class="fa-solid fa-palette text-pink-400"></i> THEMES & DEMOS</span>
+                <i class="fa-solid fa-chevron-right text-pink-400"></i>
+            </button>
+            <button onclick="toggleProfileModal(true)" class="glass w-full p-4 rounded-xl flex justify-between items-center hover:shadow-neon transition group">
+                <span class="flex items-center gap-3"><i class="fa-solid fa-user-astronaut text-blue-400"></i> PROFILE SETTINGS</span>
+                <i class="fa-solid fa-chevron-right text-blue-400"></i>
+            </button>
+        </div>
+    </main>
+
+    <div id="dashboardModal" class="fixed inset-0 z-[300] hidden bg-[#0f172a] overflow-y-auto">
+        <header class="bg-[#1e293b] p-4 flex justify-between items-center sticky top-0 border-b border-white/5">
+            <div class="flex items-center gap-4">
+                <i class="fa-solid fa-xmark text-xl cursor-pointer" onclick="closeDashboard()"></i>
+                <h2 class="font-bold text-lg">Dashboard | <span class="text-gray-400 font-normal">ALONE BOY</span></h2> </div>
+            <div class="flex gap-4 items-center">
+                <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
+                <div class="w-8 h-8 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 font-bold text-xs border border-orange-500/50">?</div>
+            </div>
+        </header>
+        
+        <div class="p-4 space-y-4">
+            <div class="space-y-3">
+                <div class="dash-nav-item">
+                    <div class="flex items-center gap-3 text-gray-300">
+                        <i class="fa-solid fa-chart-simple"></i>
+                        <span class="text-sm font-semibold uppercase tracking-wider">Leaderboard</span>
+                    </div>
+                    <div class="w-6 h-6 bg-purple-500 rounded-lg flex items-center justify-center"><i class="fa-solid fa-arrow-left text-[10px] text-white"></i></div>
+                </div>
+                <div class="dash-nav-item">
+                    <div class="flex items-center gap-3 text-gray-300">
+                        <i class="fa-solid fa-bullhorn"></i>
+                        <span class="text-sm font-semibold uppercase tracking-wider">Announcements</span>
+                    </div>
+                    <div class="w-6 h-6 bg-purple-500 rounded-lg flex items-center justify-center"><i class="fa-solid fa-arrow-left text-[10px] text-white"></i></div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="dash-card">
+                    <div class="w-10 h-10 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-2"><i class="fa-solid fa-user text-green-500"></i></div>
+                    <h3 class="text-2xl font-bold">live member</h3>
+                    <p class="text-xs text-gray-400">Members</p>
+                </div>
+                <div class="dash-card">
+                    <div class="w-10 h-10 bg-orange-500/10 rounded-full flex items-center justify-center mx-auto mb-2"><i class="fa-solid fa-gem text-orange-500"></i></div>
+                    <h3 class="text-2xl font-bold">222</h3>
+                    <p class="text-xs text-gray-400">VIP Members</p>
+                </div>
+            </div>
+
+            <div class="space-y-3 mt-4">
+                <div class="status-row">
+                    <div><p class="text-green-500 font-bold text-sm">ONLINE</p><p class="text-xs text-gray-400">Panel Status</p></div>
+                    <i class="fa-solid fa-circle-check text-green-500 text-xl"></i>
+                </div>
+                <div class="status-row">
+                    <div><p class="text-green-500 font-bold text-sm">ONLINE</p><p class="text-xs text-gray-400">Mailer Status</p></div>
+                    <i class="fa-solid fa-circle-check text-green-500 text-xl"></i>
+                </div>
+                <div class="status-row">
+                    <div><p class="text-green-500 font-bold text-sm">ONLINE</p><p class="text-xs text-gray-400">Bot Status</p></div>
+                    <i class="fa-solid fa-circle-check text-green-500 text-xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="accountModal" class="fixed inset-0 z-[110] hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div class="glass w-full max-w-md rounded-2xl overflow-hidden border border-white/10 shadow-2xl flex flex-col max-h-[90vh]">
+            <div class="p-4 border-b border-white/10 flex justify-between items-center bg-white/5">
+                <h3 class="text-sm font-bold tracking-widest uppercase flex items-center gap-2">
+                    <i class="fa-solid fa-gear text-purple-400"></i> Account Settings
+                </h3>
+                <button  onclick="toggleAccountModal(false)" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-6 space-y-6 overflow-y-auto modal-scroll">
+                <body class="dark text-white min-h-screen">
+
+    <header class="glass shadow-glass p-4 flex justify-between items-center sticky top-0 z-50">
+        <div class="flex gap-4 text-xl items-center">  
+        </div>
+        <div </div>        
+                     
+        </div>
+    </header>                    
+
+        <div class="glass rounded-2xl shadow-neon overflow-hidden p-6 text-center">
+            <h2 class="text-xl font-bold">WELCOME BACK</h2>
+            <p class="text-gray-400 text-sm">Manage your account settings below</p>
+        </div>
+
+        <div class="glass rounded-2xl p-6 border border-white/10 space-y-6">
+            <div class="flex items-center gap-2 border-b border-white/10 pb-3">
+                <i class="fa-solid fa-user-gear text-purple-400"></i>
+            </div>
+
+            <div class="space-y-4">
+                <div>        
+                    <span class="label-text">Username</span>
+                    <input type="text" value="Rr" class="input-box">
+                </div>
+                <div>
+                    <span class="label-text">Email Address</span>
+                    <input type="email" value="hernduhe@gmail.com" class="input-box">
+                </div>
+                <div>
+                    <span class="label-text">Name</span>
+                    <input type="text" value="NoisyWeb" class="input-box">
+                </div>
+                <div>
+                    <span class="label-text">Encryption Key</span>
+                    <input type="text" value="7c90b1fe7ac692444cc1" class="input-box font-mono text-xs">
+                </div>
+                <button class="btn-purple !w-auto px-8 float-right">Save Changes</button>
+                <div class="clear-both"></div>
+            </div>
+
+            <hr class="border-white/5">
+
+            <div class="space-y-4">
+                <div class="flex justify-between items-center">
+                    <span class="text-sm font-bold text-gray-200">USE CUSTOM BOT</span>
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="bg-orange-500/10 border border-orange-500/30 p-3 rounded-lg flex gap-3 items-start">
+                    <i class="fa-solid fa-circle-exclamation text-orange-500 mt-1"></i>
+                    <p class="text-[11px] text-orange-200">Make sure that you have started the bot once and have not blocked it.</p>
+                </div>
+
+                <div>
+                    <span class="label-text">Token</span>
+                    <input type="text" placeholder="YOUR TELEGRAM BOT'S AUTHENTICATION TOKEN" class="input-box">
+                </div>
+                <div>
+                    <span class="label-text">User ID</span>
+                    <input type="text" placeholder="YOUR TELEGRAM USER ID FOR NOTIFICATIONS" class="input-box">
+                </div>
+
+                <div class="flex gap-2">
+                    <button class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2">
+                        <i class="fa-solid fa-plug"></i> Test
+                    </button>
+                    <button class="btn-purple">Save Changes</button>
+                </div>
+            </div>
+
+            <hr class="border-white/5">
+
+            <div class="space-y-4">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-lock text-pink-400 text-xs"></i>
+                    <span class="label-text !mb-0">Change Password</span>
+                </div>
+                <div>
+                    <input type="password" placeholder="CURRENT PASSWORD" class="input-box">
+                </div>
+                <div>
+                    <input type="password" placeholder="NEW PASSWORD" class="input-box">
+                </div>
+                <div>
+                    <input type="password" placeholder="CONFIRM NEW PASSWORD" class="input-box">
+                </div>
+                <button class="btn-purple bg-gradient-to-r from-purple-600 to-pink-600">Change Password</button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="text-center text-xs text-gray-500 py-10">
+ 
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="themesModal" class="fixed inset-0 z-[100] hidden flex items-end sm:items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div class="glass w-full max-w-md rounded-2xl border border-white/20 shadow-neon overflow-hidden">
+            <div class="p-4 border-b border-white/10 flex justify-between items-center bg-white/5">
+                <h3 class="font-bold flex items-center gap-2 uppercase text-sm tracking-widest"><i class="fa-solid fa-palette"></i> Themes & Demos</h3>
+                <button onclick="toggleModal(false)" class="w-8 h-8 rounded-lg bg-red-500/20 text-red-400 flex items-center justify-center hover:bg-red-500 hover:text-white transition"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="themeContainer" class="p-4 max-h-[60vh] overflow-y-auto modal-scroll space-y-3"></div>
+        </div>
+    </div>
+
+    <div id="profileModal" class="fixed inset-0 z-[120] hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div class="glass w-full max-w-md rounded-2xl overflow-hidden border border-white/10 shadow-2xl flex flex-col">
+            <div class="p-4 border-b border-white/10 flex justify-between items-center bg-white/5">
+                <h3 class="text-sm font-bold                     <i class="fa-solid fa-user-circle text-blue-400"></i> Profile Settings
+                </h3>
+                <button onclick="toggleProfileModal(false)" class="text-gray-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            
+            <div class="p-6 space-y-8">
+                <div class="space-y-3">
+                    <label class="label-text">Avatar</label>
+                    <div class="file-input-wrapper">
+                        <label class="file-btn">Choose File <input type="file" class="hidden" onchange="updateFileName(this, 'avatarName')"></label>
+                        <span id="avatarName" class="file-name text-xs text-gray-400">No file chosen</span>
+                    </div>
+                    <button class="w-full bg-[#7c3aed] py-2.5 rounded-lg text-sm font-bold hover:bg-[#6d28d9] transition">Change Avatar</button>
+                </div>
+
+                <div class="space-y-3">
+                    <label class="label-text">Banner</label>
+                    <div class="file-input-wrapper">
+                        <label class="file-btn">Choose File <input type="file" class="hidden" onchange="updateFileName(this, 'bannerName')"></label>
+                        <span id="bannerName" class="file-name text-xs text-gray-400">No file chosen
+                    </div>
+                    <button class="w-full bg-[#7c3aed] py-2.5 rounded-lg text-sm font-bold hover:bg-[#6d28d9] transition">Change Banner</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <footer class="text-center text-xs text-gray-500 mt-10 pb-10">
+        ⚡ POWERED BY <span class="text-purple-400 font-bold">ALONE BOY PREMIUM</span>
+    </footer>
+
+    <script>
+        function toggleSidebar(show) {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            if (show) {
+                sidebar.style.transform = "translateX(0)";
+                overlay.style.display = "block";
+            } else {
+                sidebar.style.transform = "translateX(-100%)";
+                overlay.style.display = "none";
+            }
+        }
+
+        function openDashboard() {
+            document.getElementById('dashboardModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDashboard() {
+            document.getElementById('dashboardModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        const themesList = ["ALL GUNS 2", "MIX 2", "COIN EXCHANGE 3", "NEE EVENT 1", "GALACTIC BUNNY", "TROUBLE RING", "COINS EXCHANGE 2", "FF TOURNAMENT", "NARUTO UID 2"];
+        let currentActive = 0;
+
+        function renderThemes() {
+            const container = document.getElementById('themeContainer');
+            if(!container) return;
+            container.innerHTML = themesList.map((name, index) => {
+                const isActive = index === currentActive;
+                return `
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-white/5 border ${isActive ? 'border-purple-500' : 'border-white/5'} transition group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center text-green-400"><i class="fa-solid fa-bolt"></i></div>
+                            <div>
+                                <p class="font-medium text-sm text-gray-200">${name}</p>
+                                <p class="text-[10px] text-green-400 flex items-center gap-1"><i class="fa-solid fa-gem text-[8px]"></i> ONLINE</p>
+                            </div>
+                        </div>
+                        <button onclick="setTheme(${index})" class="px-4 py-1.5 rounded-lg text-xs font-bold transition ${isActive ? 'btn-in-use text-gray-300' : 'bg-pink-600 hover:bg-pink-500 text-white'}">
+                            ${isActive ? 'IN USE' : 'USE'}
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function setTheme(index) { currentActive = index; renderThemes(); }
+        function toggleModal(show) { document.getElementById('themesModal').classList.toggle('hidden', !show); if (show) renderThemes(); }
+        function toggleAccountModal(show) { document.getElementById('accountModal').classList.toggle('hidden', !show); }
+        function toggleProfileModal(show) { document.getElementById('profileModal').classList.toggle('hidden', !show); }
+
+        window.onclick = function(event) {
+            ['themesModal', 'accountModal', 'profileModal'].forEach(id => {
+                const modal = document.getElementById(id);
+                if (event.target == modal) modal.classList.add('hidden');
+            });
+        }
+    </script>
+</body>
+</html>
