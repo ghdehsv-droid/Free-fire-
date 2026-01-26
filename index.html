@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZYNEX WEB - Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: #000000; height: 100vh; display: flex; flex-direction: column; overflow: hidden; color: white; }
+        
+        .header-section { 
+            width: 100%; height: 38vh; 
+            background: linear-gradient(135deg, #2b10ff 0%, #00d2ff 100%); 
+            border-bottom-left-radius: 90px; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            position: relative;
+        }
+
+        #statusMsg {
+            position: absolute;
+            top: 20px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: bold;
+            display: none;
+            z-index: 100;
+            text-align: center;
+            width: 85%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .error-msg { background: #ff3333; color: white; }
+        .success-msg { background: #00ff88; color: #000; }
+
+        .header-section h1 { font-size: 40px; font-weight: 800; letter-spacing: 2px; }
+
+        .form-container { flex: 1; padding: 40px 30px; display: flex; flex-direction: column; max-width: 500px; margin: 0 auto; width: 100%; }
+        .input-group { margin-bottom: 25px; }
+        .input-group label { display: block; font-size: 12px; color: #00d2ff; margin-bottom: 10px; font-weight: bold; text-transform: uppercase; }
+        .input-wrapper { position: relative; display: flex; align-items: center; }
+        .input-wrapper i.main-icon { position: absolute; left: 15px; color: #00d2ff; font-size: 18px; }
+        
+        .input-wrapper input { 
+            width: 100%; padding: 18px 50px 18px 50px; 
+            background: #111; border: 1.5px solid #222; 
+            border-radius: 15px; color: white; outline: none; transition: 0.3s;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            cursor: pointer;
+            color: #666;
+            font-size: 18px;
+            transition: 0.3s;
+        }
+
+        .btn-login { 
+            width: 100%; padding: 18px; 
+            background: linear-gradient(90deg, #2b10ff, #00d2ff); 
+            border: none; border-radius: 15px; color: white; 
+            font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; 
+        }
+        .btn-login:disabled { opacity: 0.7; cursor: not-allowed; }
+
+        .footer-text { text-align: center; margin-top: 25px; color: #666; font-size: 14px; }
+        .footer-text span { color: #00d2ff; font-weight: bold; cursor: pointer; text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <div class="header-section">
+        <div id="statusMsg"></div>
+        <h1>ZYNEX WEB</h1>
+        <p>WELCOME</p>
+    </div>
+
+    <div class="form-container">
+        <div class="input-group">
+            <label>Email or Username</label>
+            <div class="input-wrapper">
+                <i class="fa-solid fa-user main-icon"></i> 
+                <input type="text" id="userInput" placeholder="Enter email or username">
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Password</label>
+            <div class="input-wrapper">
+                <i class="fas fa-unlock-alt main-icon"></i>
+                <input type="password" id="password" placeholder="Enter password">
+                <i class="fa-solid fa-eye toggle-password" id="eyeIcon"></i>
+            </div>
+        </div>
+
+        <button class="btn-login" id="loginBtn">LOGIN</button>
+        <p class="footer-text">New member? <span id="goToSignUp">REGISTER</span></p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAXsRkbv2eKhT-rSbKCdeqn_uOHVdjxT3E",
+            authDomain: "zynex-web.firebaseapp.com",
+            databaseURL: "https://zynex-web-default-rtdb.firebaseio.com",
+            projectId: "zynex-web",
+            storageBucket: "zynex-web.firebasestorage.app",
+            messagingSenderId: "644895015941",
+            appId: "1:644895015941:web:e516275a7cf3be437e086c"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        const loginBtn = document.getElementById('loginBtn');
+        const statusBox = document.getElementById('statusMsg');
+        const passwordInput = document.getElementById('password');
+        const eyeIcon = document.getElementById('eyeIcon');
+
+        // UPDATED: Ab kagaj upar se niche girenge
+        function loginBlastEffect() {
+            var duration = 3 * 1000; // 3 second tak girenge
+            var end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 3,
+                    angle: 90, // Niche ki taraf
+                    spread: 120,
+                    origin: { x: Math.random(), y: -0.1 }, // Screen ke upar se start
+                    colors: ['#2b10ff', '#00d2ff', '#ffffff'],
+                    ticks: 200
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+
+        eyeIcon.addEventListener('click', () => {
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                eyeIcon.classList.replace("fa-eye", "fa-eye-slash");
+            } else {
+                passwordInput.type = "password";
+                eyeIcon.classList.replace("fa-eye-slash", "fa-eye");
+            }
+        });
+
+        function showMsg(text, type) {
+            statusBox.innerText = text;
+            statusBox.className = type === 'error' ? 'error-msg' : 'success-msg';
+            statusBox.style.display = 'block';
+            if(type === 'error') setTimeout(() => { statusBox.style.display = 'none'; }, 4000);
+        }
+
+        loginBtn.addEventListener('click', async () => {
+            const userInput = document.getElementById('userInput').value.trim();
+            const password = passwordInput.value;
+
+            if (!userInput || !password) {
+                showMsg("Sabhi fields bharna zaruri hai!", "error");
+                return;
+            }
+
+            loginBtn.innerText = "Logging...";
+            loginBtn.disabled = true;
+            
+            let loginEmail = userInput;
+
+            if (!userInput.includes("@")) {
+                try {
+                    const dbRef = ref(db);
+                    const snapshot = await get(child(dbRef, `usernames/${userInput.toLowerCase()}`));
+                    if (snapshot.exists()) {
+                        loginEmail = snapshot.val().email;
+                    } else {
+                        showMsg("Username nahi mila!", "error");
+                        resetBtn();
+                        return;
+                    }
+                } catch (error) {
+                    showMsg("Database Error!", "error");
+                    resetBtn();
+                    return;
+                }
+            }
+
+            signInWithEmailAndPassword(auth, loginEmail, password)
+            .then(() => {
+                localStorage.setItem("userEmail", loginEmail);
+                
+                loginBlastEffect(); // Success par kagaj girenge
+                showMsg("Login Success!", "success");
+
+                setTimeout(() => {
+                    window.location.href = "profile.html"; 
+                }, 2500);
+            })
+            .catch((error) => {
+                showMsg("Login Fail: Check Details", "error");
+                resetBtn();
+            });
+        });
+
+        function resetBtn() {
+            loginBtn.innerText = "LOGIN";
+            loginBtn.disabled = false;
+        }
+
+        document.getElementById('goToSignUp').addEventListener('click', () => {
+            window.location.href = "signup.html"; 
+        });
+    </script>
+</body>
+</html>
